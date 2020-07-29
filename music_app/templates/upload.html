@@ -1,0 +1,24 @@
+{% extends "public_template.html" %}
+{% import "macros/input_macro.html" as im %}
+{% block title %}Upload Song{% endblock %}
+{% block main %}
+<div class="container">
+   <div class="row">
+      <div class="col">
+         {% if message %}
+         <p>{{ message }}</p>
+         {% endif %}
+         <h1>Upload a Song</h1>
+         <hr>
+         <form action="/upload" method="POST" enctype="multipart/form-data">
+            {{ im.input(label="Title", type="text", id="title", name="title",  placeholder="Enter Title of the Song") }}
+            {{ im.input(label="Artist", type="text", id="artist",  name = "artist", placeholder="Enter Artist Name") }}
+            {{ im.input(label="Album", type="text", id="album",  name = "album", placeholder="Enter Album Name") }}
+            {{ im.input(label="Song", type="text", id="song",  name = "song", placeholder="Enter Song Name") }}
+            {{ im.input(label="URL", type="url", id="url", name="url", placeholder="Enter or paste link here") }}
+            <button type="submit" class="btn-primary">Submit</button>
+         </form>
+      </div>
+   </div>
+</div>
+{% endblock %}
