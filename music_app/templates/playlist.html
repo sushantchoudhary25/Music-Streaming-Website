@@ -1,0 +1,43 @@
+{% extends "public_template.html" %}
+{% block title %}Upload Song{% endblock %}
+{% block main %}
+<div class="container">
+   <div class="row">
+      <div class="col">
+         <h1>My Playlist</h1>
+         <hr>
+         <div class="container">
+            <div class="row">
+               <div class="col">
+                  {% if records %}
+                  <ul class="list-group">
+                     {% for song in playlist %}
+                     <div class="list-group-item">
+                        <div class="row">
+                           <div class="col-sm-4">{{ song[0] }}</div>
+                           <div class="col-sm-3">{{ song[1] }}</div>
+                           <div class="col-sm-3">{{ song[2] }}</div>
+                           <div class="col-sm-1">
+                              <button type="button" class="btn btn-outline-primary btn-sm">Play</button>
+                           </div>
+                           <div class="col-sm-1">
+                              <button type="button" class="btn btn-outline-primary btn-sm">Delete</button>
+                           </div>
+                        </div>
+                     </div>
+                     {% endfor %}
+                  </ul>
+                  {% else %}
+                  <div class="list-group-item">
+                     <div class="row">
+                        <div class="col-sm-10">No Record Found !! Please Upload some Songs</div>
+                     </div>
+                  </div>
+                  {% endif %}
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+{% endblock %}

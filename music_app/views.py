@@ -32,3 +32,21 @@ def upload_song():
         return redirect(request.url)
 
     return render_template("upload.html")
+
+
+def fetch_all_songs():
+    try:
+        crsr.execute(sql.fetch_songs)
+        return crsr.fetchall()
+    except Exception as err:
+        raise err
+
+
+@app.route("/playlist")
+def view_playlist():
+    playlist = fetch_all_songs()
+    records = False
+    if len(playlist) != 0:
+        print(playlist)
+        records = True
+    return render_template("playlist.html", playlist=playlist, records=records)
