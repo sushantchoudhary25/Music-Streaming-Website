@@ -1,6 +1,7 @@
 from music_app import app, crsr
 from flask import render_template, request, redirect
 from music_app.sql import sql
+import uuid
 
 
 @app.route("/")
@@ -15,7 +16,7 @@ def insert_into_playlist(req):
         res = crsr.fetchall()
 
         if len(res) == 0:
-            query = sql.insert_statement.format(req.get("title"), req.get("artist"),
+            query = sql.insert_statement.format(uuid.uuid4(), req.get("title"), req.get("artist"),
                                                 req.get("album"), req.get("url"))
             crsr.execute(query)
             app.logger.info("Inserted record successfully")
@@ -27,7 +28,6 @@ def insert_into_playlist(req):
 def upload_song():
     if request.method == "POST":
         insert_into_playlist(request.form)
-
         return redirect(request.url)
 
     return render_template("upload.html")
@@ -45,7 +45,7 @@ def fetch_all_songs():
 def view_playlist():
     playlist = fetch_all_songs()
     records = False
-    if len(playlist) != 0:
+    if playlist:
         records = True
     return render_template("playlist.html", playlist=playlist, records=records)
 
@@ -79,3 +79,20 @@ def search_database():
 @app.route("/search")
 def search():
     return render_template("search.html", message=None)
+
+
+def delete_record(song_id):
+    try:
+        crsr.execute(sql.delete.format(song_id))
+    except Exception as err:
+        raise err
+
+
+@app.route("/delete/<song_id>", methods=["GET", "POST"])
+def delete(song_id):
+    delete_record(song_id)
+    playlist = fetch_all_songs()
+    if not playlist:
+        return render_template("playlist.html", playlist=playlist, records=False)
+
+    return render_template("playlist.html", playlist=playlist, records=True)
