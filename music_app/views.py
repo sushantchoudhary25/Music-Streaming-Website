@@ -96,3 +96,17 @@ def delete(song_id):
         return render_template("playlist.html", playlist=playlist, records=False)
 
     return render_template("playlist.html", playlist=playlist, records=True)
+
+
+def get_url(song_id):
+    try:
+        crsr.execute("SELECT title, url from playlist where songId = '{}'".format(song_id))
+        return crsr.fetchall()[0]
+    except Exception as err:
+        raise err
+
+
+@app.route("/play/<song_id>")
+def play(song_id):
+    link = get_url(song_id)
+    return render_template("player.html", link=link[1], title=link[1])

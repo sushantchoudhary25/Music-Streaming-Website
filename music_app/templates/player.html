@@ -1,0 +1,25 @@
+{% extends "public_template.html" %}
+{% block title %}Music Player{% endblock %}
+{% block main %}
+<div class="container">
+   <div class="row">
+      <div class="col">
+         <h1>My Player</h1>
+         <hr>
+
+          <div class="contaier">
+              <div class="row">
+                  <div class="col">
+                      <audio controls>
+                       <source src="{{ link }}" type="audio/mpeg">
+                    </audio>
+                  </div>
+                  <div class="col">
+                      <a href="{{ link }}" download="{{ title }}">DownloadButton</a>
+                  </div>
+              </div>
+          </div>
+      </div>
+   </div>
+</div>
+{% endblock %}
