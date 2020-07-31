@@ -6,7 +6,9 @@
    <div class="row">
       <div class="col">
          {% if message %}
-         <p>{{ message }}</p>
+          <script>
+              alert("{{ message }}")
+          </script>
          {% endif %}
          <h1>Upload a Song</h1>
          <hr>
@@ -14,10 +16,25 @@
             {{ im.input(label="Title", type="text", id="title", name="title",  placeholder="Enter Title of the Song") }}
             {{ im.input(label="Artist", type="text", id="artist",  name = "artist", placeholder="Enter Artist Name") }}
             {{ im.input(label="Album", type="text", id="album",  name = "album", placeholder="Enter Album Name") }}
-            {{ im.input(label="URL", type="url", id="url", name="url", placeholder="Enter or paste link here") }}
+            <!--{{ im.input(label="URL", type="url", id="url", name="url", placeholder="Enter or paste link here") }}-->
+            <div class="form-group">
+                <label>Select MP3</label>
+                <div class="custom-file">
+                  <input type="file" class="custom-file-input" name="song" id="song" oninput="filesize(this);" required>
+                  <label class="custom-file-label" for="song">Select MP3...</label>
+                </div>
+            </div>
             <button type="submit" class="btn-primary">Submit</button>
          </form>
       </div>
    </div>
 </div>
+{% endblock %}
+{% block script %}
+<script>
+  function filesize(elem){
+    document.cookie = `filesize=${elem.files[0].size}`
+  }
+
+</script>
 {% endblock %}
