@@ -1,30 +1,33 @@
 import os
 from music_app import app
-from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
+from azure.storage.blob import BlobServiceClient
 
 
 class Storage(object):
-    connection_string = os.getenv("STORAGE_ACCOUNT_CONNECTION_STRING")
+    def __init__(self):
+        self.connection_string = os.getenv("STORAGE_ACCOUNT_CONNECTION_STRING")
 
-    @staticmethod
-    def get_blob_client(file_name):
-        service_client = BlobServiceClient.from_connection_string(Storage.connection_string)
-        blob_client = service_client.get_blob_client(container=app.config.get("STORAGE_CONTAINER_NAME"), blob=file_name)
-        return blob_client
+    def get_blob_client(self, file_name):
+        try:
+            service_client = BlobServiceClient.from_connection_string(self.connection_string)
+            blob_client = service_client.get_blob_client(container=app.config.get("STORAGE_CONTAINER_NAME"), blob=file_name)
+            return blob_client
+        except Exception as err:
+            raise err
 
-    @staticmethod
-    def upload_file(file_path, file_name):
-        blob_client = Storage.get_blob_client(file_name=file_name)
+    def upload_file(self, file_path, file_name):
+        try:
+            blob_client = self.get_blob_client(file_name=file_name)
 
-        with open(file_path, "rb") as blob:
-            blob_client.upload_blob(blob)
+            with open(file_path, "rb") as blob:
+                blob_client.upload_blob(blob)
+        except Exception as err:
+            raise err
 
-    @staticmethod
-    def delete_blob(blob_id):
-        file_name = blob_id + ".mp3"
-        blob_client = Storage.get_blob_client(file_name=file_name)
-        blob_client.delete_blob()
-
-
-if __name__ == '__main__':
-    Storage.upload_file("/Users/schoudhary/Music-Streaming-Website/music_app/uploads/sample.txt", "sample.txt")
+    def delete_blob(self, blob_id):
+        try:
+            file_name = blob_id + ".mp3"
+            blob_client = self.get_blob_client(file_name=file_name)
+            blob_client.delete_blob()
+        except Exception as err:
+            raise err

@@ -1,58 +1,12 @@
-from music_app import app, crsr
+from music_app import app, connection, storage_client
 from flask import render_template, request, redirect
-from music_app.sql import sql
 import uuid, os
-from music_app.storage import Storage
+from music_app.helpers import Helper
 
 
 @app.route("/")
 def home():
     return render_template("homepage.html")
-
-
-def get_unique_url(filename):
-    return "https://sushant25.blob.core.windows.net/" + app.config.get("STORAGE_CONTAINER_NAME") + "/" + filename
-
-
-def insert_into_playlist(song_id, title, artist, album, filename):
-    try:
-
-        if not check_existing_record(title, artist, album):
-            query = sql.insert_statement.format(song_id, title, artist, album, get_unique_url(filename))
-            crsr.execute(query)
-            app.logger.info("Inserted record successfully")
-    except Exception as err:
-        raise err
-
-
-def check_existing_record(title, artist, album):
-    try:
-        crsr.execute(
-            "SELECT * from playlist where artist = '{}' and album = '{}' and title = '{}'".format(artist, album, title))
-        res = crsr.fetchall()
-        if len(res) == 0:
-            return False
-        return True
-    except Exception as err:
-        raise err
-
-
-def allowed_extenstion(filename):
-    if not "." in filename:
-        return False
-
-    ext = filename.rsplit(".", 1)[1]
-
-    if ext.upper() in app.config.get("ALLOWED_IMAGE_EXTENSIONS"):
-        return True
-    return False
-
-
-def allowed_filesize(filesize):
-    if int(filesize) <= app.config["MAX_CONTENT_SIZE"]:
-        return True
-    else:
-        return False
 
 
 @app.route("/upload", methods=["GET", "POST"])
@@ -61,16 +15,16 @@ def upload():
 
         if request.files:
             if "filesize" in request.cookies:
-                if not allowed_filesize(request.cookies["filesize"]):
+                if not Helper.allowed_filesize(request.cookies["filesize"]):
                     app.logger.info("Filesize exceeded maximum limit")
-                    return render_template("upload.html", message="please upload filesize less than 10MB")
+                    return render_template("upload.html", message="please upload filesize less than {}MB".format(app.config.get("MAX_CONTENT_SIZE") // (1024 * 1024)))
 
                 req = request.form
                 title = req.get("title")
                 artist = req.get("artist")
                 album = req.get("album")
 
-                if check_existing_record(title, artist, album):
+                if connection.check_existing_record(title, artist, album):
                     return redirect(request.url)
 
                 song = request.files["song"]
@@ -79,7 +33,7 @@ def upload():
                     app.logger.info("Invalid file name")
                     return render_template("upload.html", message="invalid file name")
 
-                if not allowed_extenstion(song.filename):
+                if not Helper.allowed_extenstion(song.filename):
                     app.logger.info("invalid Extension")
                     return render_template("upload.html", message="invalid extenstion, please upload mp3")
 
@@ -91,9 +45,9 @@ def upload():
 
                 song.save(path)
 
-                Storage.upload_file(path, unique_filename)
+                storage_client.upload_file(path, unique_filename)
 
-                insert_into_playlist(song_id, title, artist, album, unique_filename)
+                connection.insert_into_playlist(song_id, title, artist, album, unique_filename)
 
                 os.remove(path=path)
                 return render_template("upload.html", message="song uploaded successfully")
@@ -101,29 +55,13 @@ def upload():
     return render_template("upload.html")
 
 
-def fetch_all_songs():
-    try:
-        crsr.execute(sql.fetch_songs)
-        return crsr.fetchall()
-    except Exception as err:
-        raise err
-
-
 @app.route("/playlist")
 def view_playlist():
-    playlist = fetch_all_songs()
+    playlist = connection.fetch_all_songs()
     records = False
     if playlist:
         records = True
     return render_template("playlist.html", playlist=playlist, records=records)
-
-
-def search_songs(category, value):
-    try:
-        crsr.execute(sql.search.format(category, value))
-        return crsr.fetchall()
-    except Exception as err:
-        raise err
 
 
 @app.route("/search-database", methods=["POST"])
@@ -136,7 +74,7 @@ def search_database():
     if category not in ["artist", "album", "title"]:
         return render_template("search.html", message="category should be [Artist, Title, Album]")
 
-    playlist = search_songs(category=category, value=value)
+    playlist = connection.search_songs(category=category, value=value)
 
     if not playlist:
         return render_template("search.html", message="No Record Found")
@@ -149,34 +87,23 @@ def search():
     return render_template("search.html", message=None)
 
 
-def delete_record(song_id):
-    try:
-        crsr.execute(sql.delete.format(song_id))
-    except Exception as err:
-        raise err
-
-
 @app.route("/delete/<song_id>", methods=["GET", "POST"])
 def delete(song_id):
-    delete_record(song_id)
-    Storage.delete_blob(song_id)
-    playlist = fetch_all_songs()
+    connection.delete_record(song_id)
+    storage_client.delete_blob(song_id)
+    playlist = connection.fetch_all_songs()
     if not playlist:
         return render_template("playlist.html", playlist=playlist, records=False)
 
     return render_template("playlist.html", playlist=playlist, records=True)
 
 
-def get_url(song_id):
-    try:
-        crsr.execute("SELECT title, url from playlist where songId = '{}'".format(song_id))
-        return crsr.fetchall()[0]
-    except Exception as err:
-        raise err
-
-
 @app.route("/play/<song_id>")
 def play(song_id):
-    link = get_url(song_id)
-    print(link)
+    link = connection.get_url(song_id)
     return render_template("player.html", link=link[1], title=link[1])
+
+
+@app.route("/stream")
+def stream():
+    return redirect("/playlist")

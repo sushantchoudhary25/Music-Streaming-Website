@@ -1,0 +1,1 @@
+This folder will temporarily hold the files before actually uploading to the blob stoarge, and will be deleted as soon as file is uploaded to cloud.

@@ -10,6 +10,15 @@
             <div class="row">
                <div class="col">
                   {% if records %}
+                  <div class="list-group-item">
+                     <div class="row">
+                        <div class="col-sm-4">Title</div>
+                        <div class="col-sm-3">Artist</div>
+                        <div class="col-sm-3">Album</div>
+                        <div class="col-sm-1">Play</div>
+                        <div class="col-sm-1">Delete</div>
+                     </div>
+                  </div>
                   <ul class="list-group">
                      {% for song in playlist %}
                      <div class="list-group-item">
