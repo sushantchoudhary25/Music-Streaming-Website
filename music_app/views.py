@@ -96,7 +96,7 @@ def upload():
                 insert_into_playlist(song_id, title, artist, album, unique_filename)
 
                 os.remove(path=path)
-                return redirect(request.url)
+                return render_template("upload.html", message="song uploaded successfully")
 
     return render_template("upload.html")
 
@@ -159,7 +159,7 @@ def delete_record(song_id):
 @app.route("/delete/<song_id>", methods=["GET", "POST"])
 def delete(song_id):
     delete_record(song_id)
-    Storage.delete_file
+    Storage.delete_blob(song_id)
     playlist = fetch_all_songs()
     if not playlist:
         return render_template("playlist.html", playlist=playlist, records=False)
@@ -178,4 +178,5 @@ def get_url(song_id):
 @app.route("/play/<song_id>")
 def play(song_id):
     link = get_url(song_id)
+    print(link)
     return render_template("player.html", link=link[1], title=link[1])

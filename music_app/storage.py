@@ -8,10 +8,9 @@ class Storage(object):
 
     @staticmethod
     def get_blob_client(file_name):
-
-            service_client = BlobServiceClient.from_connection_string(Storage.connection_string)
-            blob_client = service_client.get_blob_client(container=app.config.get("STORAGE_CONTAINER_NAME"), blob=file_name)
-            return blob_client
+        service_client = BlobServiceClient.from_connection_string(Storage.connection_string)
+        blob_client = service_client.get_blob_client(container=app.config.get("STORAGE_CONTAINER_NAME"), blob=file_name)
+        return blob_client
 
     @staticmethod
     def upload_file(file_path, file_name):
@@ -19,6 +18,12 @@ class Storage(object):
 
         with open(file_path, "rb") as blob:
             blob_client.upload_blob(blob)
+
+    @staticmethod
+    def delete_blob(blob_id):
+        file_name = blob_id + ".mp3"
+        blob_client = Storage.get_blob_client(file_name=file_name)
+        blob_client.delete_blob()
 
 
 if __name__ == '__main__':
