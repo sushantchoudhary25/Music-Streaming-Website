@@ -5,7 +5,7 @@ from azure.storage.blob import BlobServiceClient
 
 class Storage(object):
     def __init__(self):
-        self.connection_string = os.getenv("STORAGE_ACCOUNT_CONNECTION_STRING")
+        self.connection_string = app.config.get("STORAGE_ACCOUNT_CONNECTION_STRING")
 
     def get_blob_client(self, file_name):
         try:

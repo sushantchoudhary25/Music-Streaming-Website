@@ -20,8 +20,7 @@ class SQL(object):
 
         self.url = "SELECT title, url from playlist where songId = '{}'"
 
-        self.connection = sqlite3.connect(app.config["PROJECT_ROOT_DIR"] + "/Music-Streaming-Website/music_app/data"
-                                                                           "/songs.db", check_same_thread=False)
+        self.connection = sqlite3.connect(app.config.get("PROJECT_ROOT_DIR") + "/music_app/data/songs.db", check_same_thread=False)
 
         self.cursor = self._get_cursor()
 

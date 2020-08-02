@@ -17,7 +17,8 @@ def upload():
             if "filesize" in request.cookies:
                 if not Helper.allowed_filesize(request.cookies["filesize"]):
                     app.logger.info("Filesize exceeded maximum limit")
-                    return render_template("upload.html", message="please upload filesize less than {}MB".format(app.config.get("MAX_CONTENT_SIZE") // (1024 * 1024)))
+                    return render_template("upload.html", message="please upload filesize less than {}MB".
+                                           format(app.config.get("MAX_CONTENT_SIZE") // (1024 * 1024)))
 
                 req = request.form
                 title = req.get("title")

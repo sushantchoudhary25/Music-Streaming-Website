@@ -1,8 +1,12 @@
+import os
+
+
 class Config(object):
     DEBUG = True
-    PROJECT_ROOT_DIR = "/Users/schoudhary"
-    STORAGE_CONTAINER_NAME = "data"
-    UPLOAD_FILE_PATH = "/Music-Streaming-Website/music_app/uploads/"
-    BLOB_URL = "https://sushant25.blob.core.windows.net/data/"
+    STORAGE_ACCOUNT_CONNECTION_STRING = os.getenv("STORAGE_ACCOUNT_CONNECTION_STRING")
+    PROJECT_ROOT_DIR = os.getenv("PROJECT_ROOT_DIR")
+    STORAGE_CONTAINER_NAME = os.getenv("STORAGE_CONTAINER_NAME")
+    UPLOAD_FILE_PATH = "/music_app/uploads/"
+    BLOB_URL = os.getenv("BLOB_URL")
     ALLOWED_IMAGE_EXTENSIONS = "MP3"
     MAX_CONTENT_SIZE = 5 * 1024 * 1024
