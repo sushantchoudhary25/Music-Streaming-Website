@@ -6,14 +6,30 @@ from music_app.helpers import Helper
 
 @app.route("/")
 def home():
+    """
+    this will redirect to the homepage of the music app
+
+    :return:
+    """
     return render_template("homepage.html")
 
 
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
+    """
+    this will redirect to the song upload page of the music app
+
+    :return:
+    """
+
     if request.method == "POST":
 
+        # check whether file is actually uploaded by the user
+
         if request.files:
+
+            # to check the filesize of the uploaded file
+
             if "filesize" in request.cookies:
                 if not Helper.allowed_filesize(request.cookies["filesize"]):
                     app.logger.info("Filesize exceeded maximum limit")
@@ -30,9 +46,13 @@ def upload():
 
                 song = request.files["song"]
 
+                # check for valid filename
+
                 if song.filename == "":
                     app.logger.info("Invalid file name")
                     return render_template("upload.html", message="invalid file name")
+
+                # check whether uploaded file is mp3 or something else
 
                 if not Helper.allowed_extenstion(song.filename):
                     app.logger.info("invalid Extension")
@@ -50,7 +70,10 @@ def upload():
 
                 connection.insert_into_playlist(song_id, title, artist, album, unique_filename)
 
+                # this will delete the file from local storage once uploaded to the cloud
+
                 os.remove(path=path)
+
                 return render_template("upload.html", message="song uploaded successfully")
 
     return render_template("upload.html")
@@ -58,6 +81,12 @@ def upload():
 
 @app.route("/playlist")
 def view_playlist():
+    """
+    this will redirect to the view playlist page of the music app
+
+    :return:
+    """
+
     playlist = connection.fetch_all_songs()
     records = False
     if playlist:
@@ -67,6 +96,10 @@ def view_playlist():
 
 @app.route("/search-database", methods=["POST"])
 def search_database():
+    """"
+    this function will search for all the songs uploaded by user
+    """
+
     req = request.form
 
     category = str(req.get("category")).lower()
@@ -85,11 +118,24 @@ def search_database():
 
 @app.route("/search")
 def search():
+    """
+    this will redirect to the search page of the music app
+
+    :return:
+    """
+
     return render_template("search.html", message=None)
 
 
 @app.route("/delete/<song_id>", methods=["GET", "POST"])
 def delete(song_id):
+    """
+    this will delete the song from playlist once user will click on the delete button
+
+    :param song_id: id of the song to be deleted
+    :return:
+    """
+
     connection.delete_record(song_id)
     storage_client.delete_blob(song_id)
     playlist = connection.fetch_all_songs()
@@ -101,10 +147,22 @@ def delete(song_id):
 
 @app.route("/play/<song_id>")
 def play(song_id):
+    """
+    this will redirect to the stream a song page of the music app
+
+    :param song_id: song to be played
+    :return:
+    """
+
     link = connection.get_url(song_id)
     return render_template("player.html", link=link[1], title=link[1])
 
 
 @app.route("/stream")
 def stream():
+    """
+    this will redirect to the view playlist page of music app
+    :return:
+    """
+
     return redirect("/playlist")
