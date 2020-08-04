@@ -2,13 +2,13 @@
 chmod +rwx .
 
 # export environment variables
-export STORAGE_ACCOUNT_CONNECTION_STRING="DefaultEndpointsProtocol=https;AccountName=sushant25;AccountKey=3weU42tRnUMIGflMiSY780b8AkzrbXtxtd2bJeAN6e3ETpJ31/LOO96HhFR0q9i3P0Vif5mw/IdU2pUbAqpisA==;EndpointSuffix=core.windows.net"
+export STORAGE_ACCOUNT_CONNECTION_STRING="your_storage_account_connection_string"
 
 export PROJECT_ROOT_DIR="$PWD"
 
-export STORAGE_CONTAINER_NAME="data"
+export STORAGE_CONTAINER_NAME="your_storage_account_container_name"
 
-export BLOB_URL="https://sushant25.blob.core.windows.net/data/"
+export BLOB_URL="your_storage_account_container_url"
 
 # create virtual environment for dependencies
 python3 -m venv develop
